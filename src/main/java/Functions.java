@@ -128,6 +128,11 @@ public class Functions {
         factory.close();
         return true;
     }
+
+    public static boolean relocateCategory(){
+        return true;
+    }
+
     public static boolean findTree(){
         System.out.print("Введите название категории: ");
         String categoryName = scanner.nextLine();
