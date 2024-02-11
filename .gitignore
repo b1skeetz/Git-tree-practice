@@ -1,0 +1,14 @@
+.idea
+*.iml
+
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+*.iws
+*.ipr
+
+src/main/java/CreateCategory.java
+src/main/java/DeleteCategory.java
+src/main/java/FindTree.java
