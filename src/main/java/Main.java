@@ -16,22 +16,27 @@ public class Main {
                 case 2 -> Functions.deleteCategory();
                 case 3 -> Functions.findTree();
                 case 4 -> Functions.show();
-                case 5 -> {
-                    System.out.print("Вы точно хотите выйти? [y/n]: ");
-                    String answer = scanner.nextLine();
-                    if(answer.equals("n") || answer.equals("N")){
-                        System.out.println("Продолжаем...");
-                    } else if(answer.equals("y") || answer.equals("Y")){
-                        System.out.println("Завершение работы...");
-                        isWork = false;
-                    }
-                }
+                case 5 -> Functions.relocateCategory();
+                case 6 -> isWork = exit();
                 default -> System.out.println("Введена неверная операция!");
             }
         }
 
     }
 
+    private static boolean exit(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Вы точно хотите выйти? [y/n]: ");
+        String answer = scanner.nextLine();
+        if(answer.equals("n") || answer.equals("N")){
+            System.out.println("Продолжаем...");
+            return true;
+        } else if(answer.equals("y") || answer.equals("Y")){
+            System.out.println("Завершение работы...");
+            return false;
+        }
+        return true;
+    }
     private static void menu(){
         System.out.print("""
                 Выберите операцию:\s
@@ -39,7 +44,8 @@ public class Main {
                 2) Удалить категорию
                 3) Найти категорию
                 4) Вывести все данные
-                5) Выход
+                5) Переместить категорию
+                6) Выход
                 """);
     }
 }
