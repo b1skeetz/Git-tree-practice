@@ -139,13 +139,34 @@ public class Functions {
             ifCategoryExistsQuery.setParameter(1, categoryName);
             Category selectedCategory = ifCategoryExistsQuery.getSingleResult();
 
+            Long selectedCategoryLeftKey = selectedCategory.getLeftKey();
+            Long selectedCategoryRightKey = selectedCategory.getRightKey();
+
             manager.getTransaction().begin();
+
             Query turnKeysIntoNegativeValues = manager.createQuery("update Category c set " +
                     "c.leftKey = c.leftKey - c.leftKey * 2, c.rightKey = c.rightKey - c.rightKey * 2" +
                     "where c.rightKey <= ?1 and c.leftKey >= ?2");
             turnKeysIntoNegativeValues.setParameter(1, selectedCategory.getRightKey());
             turnKeysIntoNegativeValues.setParameter(2, selectedCategory.getLeftKey());
             turnKeysIntoNegativeValues.executeUpdate();
+
+            Query decreaseKeysRight = manager.createQuery("update Category c set " +
+                    "c.rightKey = c.rightKey- (?1 - ?2 + 1)" +
+                    "where c.rightKey > ?1 ");
+
+            decreaseKeysRight.setParameter(1, selectedCategoryRightKey);
+            decreaseKeysRight.setParameter(2, selectedCategoryLeftKey);
+            decreaseKeysRight.executeUpdate();
+
+            Query decreaseKeysLeft = manager.createQuery("update Category c set " +
+                    "c.leftKey = c.leftKey - (?1 - ?2 + 1) " +
+                    "where c.leftKey > ?1");
+
+            decreaseKeysLeft.setParameter(1, selectedCategoryRightKey);
+            decreaseKeysLeft.setParameter(2, selectedCategoryLeftKey);
+            decreaseKeysLeft.executeUpdate();
+
             manager.getTransaction().commit();
         } catch (NoResultException e){
             System.out.println("Категории с таким названием не существует!");
