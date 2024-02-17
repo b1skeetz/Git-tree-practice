@@ -5,9 +5,9 @@
              version="3.0">
     <persistence-unit name="main">
         <properties>
-            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/damir_hierarchy"/>
+            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/tree_hierarchy"/>
             <property name="hibernate.connection.username" value="postgres"/>
-            <property name="hibernate.connection.password" value="postgres"/>
+            <property name="hibernate.connection.password" value="mercy07"/>
         </properties>
     </persistence-unit>
 </persistence>
