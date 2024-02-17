@@ -130,6 +130,31 @@ public class Functions {
     }
 
     public static boolean relocateCategory(){
+        System.out.print("Введите название категории для перемещения: ");
+        String categoryName = scanner.nextLine();
+
+        try {
+            TypedQuery<Category> ifCategoryExistsQuery = manager.createQuery("select c from Category c " +
+                    "where c.category_name = ?1", Category.class);
+            ifCategoryExistsQuery.setParameter(1, categoryName);
+            Category selectedCategory = ifCategoryExistsQuery.getSingleResult();
+
+            manager.getTransaction().begin();
+            Query turnKeysIntoNegativeValues = manager.createQuery("update Category c set " +
+                    "c.leftKey = c.leftKey - c.leftKey * 2, c.rightKey = c.rightKey - c.rightKey * 2" +
+                    "where c.rightKey <= ?1 and c.leftKey >= ?2");
+            turnKeysIntoNegativeValues.setParameter(1, selectedCategory.getRightKey());
+            turnKeysIntoNegativeValues.setParameter(2, selectedCategory.getLeftKey());
+            turnKeysIntoNegativeValues.executeUpdate();
+            manager.getTransaction().commit();
+        } catch (NoResultException e){
+            System.out.println("Категории с таким названием не существует!");
+            return false;
+        } catch (Exception e){
+            manager.getTransaction().rollback();
+            System.out.println(e.getMessage());
+            return false;
+        }
         return true;
     }
 
