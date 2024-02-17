@@ -133,6 +133,11 @@ public class Functions {
         System.out.print("Введите название категории для перемещения: ");
         String categoryName = scanner.nextLine();
 
+        System.out.print("Введите название категории назначения\n " +
+                "(категория назначения должна быть выше по иерархии,\n " +
+                "чем выбранная ранее категория для перемещения): ");
+        String relocateCategoryName = scanner.nextLine();
+
         try {
             TypedQuery<Category> ifCategoryExistsQuery = manager.createQuery("select c from Category c " +
                     "where c.category_name = ?1", Category.class);
@@ -141,6 +146,17 @@ public class Functions {
 
             Long selectedCategoryLeftKey = selectedCategory.getLeftKey();
             Long selectedCategoryRightKey = selectedCategory.getRightKey();
+
+            TypedQuery<Category> parentCategoryForRelocation = manager.createQuery("select c from Category c " +
+                    "where c.category_name = ?1", Category.class);
+            parentCategoryForRelocation.setParameter(1, relocateCategoryName);
+            Category relocateCategory = parentCategoryForRelocation.getSingleResult();
+
+            if(!(relocateCategory.getHierarchyLevel() < selectedCategory.getHierarchyLevel())){
+                System.out.println("Перемещение в данную категорию не имеет смысла! " +
+                        "Выберите другую категорию назначения.");
+                return false;
+            }
 
             manager.getTransaction().begin();
 
@@ -167,7 +183,25 @@ public class Functions {
             decreaseKeysLeft.setParameter(2, selectedCategoryLeftKey);
             decreaseKeysLeft.executeUpdate();
 
+            TypedQuery<Long> selectMaxRightKeyQuery = manager.createQuery("select max(c.rightKey) from Category c ",
+                    Long.class);
+            Long maxLeftKey = selectMaxRightKeyQuery.getSingleResult();
+            selectedCategory.setLeftKey(maxLeftKey);
+            selectedCategory.setRightKey(relocateCategory.getRightKey() - 1);
+            Query updateCategories = manager.createQuery("update Category c set c.leftKey = abs(c.leftKey) + (?1 - ?2) * 2, c.rightKey = abs(c.rightKey) + (?1 - ?2) * 2" +
+                    "where c.leftKey < 0 and c.rightKey < 0");
+            updateCategories.setParameter(1, relocateCategory.getRightKey());
+            updateCategories.setParameter(2, maxLeftKey);
+            Query updateParent = manager.createQuery("update Category c set c.rightKey = ?2" +
+                    "where c.id = ?1 or (c.leftKey < ?2 and c.rightKey > ?2)");
+            updateParent.setParameter(1, relocateCategory.getId());
+            updateParent.setParameter(2, relocateCategory.getRightKey());
+            updateCategories.executeUpdate();
+            updateParent.executeUpdate();
+
             manager.getTransaction().commit();
+            System.out.println("Категория успешно перемещена!");
+            return true;
         } catch (NoResultException e){
             System.out.println("Категории с таким названием не существует!");
             return false;
@@ -176,7 +210,6 @@ public class Functions {
             System.out.println(e.getMessage());
             return false;
         }
-        return true;
     }
 
     public static boolean findTree(){
