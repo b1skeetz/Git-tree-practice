@@ -188,7 +188,31 @@ public class Functions {
 
             // =============================================================================== //
 
+            // обновленная родительская категория с новыми ключами после усечения ключей
+            TypedQuery<Category> updatedParent = MANAGER.createQuery("select c from Category c " +
+                    "where c.category_name = ?1", Category.class);
+            updatedParent.setParameter(1, relocateCategory.getName());
+            Category updatedParentCategory = updatedParent.getSingleResult();
 
+            // Разница ключей выбранной категории для увеличения всех ключей категорий, идущих после родительской
+            long selectedKeysDifference = selectedCategory.getRightKey() - selectedCategory.getLeftKey() + 1;
+            System.out.println("LONG: " + selectedKeysDifference);
+
+            // случай, когда Наушники -> Комплектующие
+
+            // увеличение только правых ключей там, где правый больше или равно обновленного родит катег правого ключа
+            Query spareSpaceRightKeysOnly = MANAGER.createQuery("update Category c set c.rightKey = c.rightKey + ?1 " +
+                    "where c.rightKey >= ?2");
+            spareSpaceRightKeysOnly.setParameter(1, selectedKeysDifference);
+            spareSpaceRightKeysOnly.setParameter(2, updatedParentCategory.getRightKey());
+            spareSpaceRightKeysOnly.executeUpdate();
+
+            // увеличение только левых ключей там, где левый больше или равно обновленного родит катег правого ключа
+            Query spareSpaceLeftKeysOnly = MANAGER.createQuery("update Category c set c.leftKey = c.leftKey + ?1 " +
+                    "where c.leftKey > ?2");
+            spareSpaceLeftKeysOnly.setParameter(1, selectedKeysDifference);
+            spareSpaceLeftKeysOnly.setParameter(2, updatedParentCategory.getRightKey());
+            spareSpaceLeftKeysOnly.executeUpdate();
 
             MANAGER.getTransaction().commit();
             System.out.println("Категория успешно перемещена!");
