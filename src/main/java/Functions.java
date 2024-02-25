@@ -171,7 +171,7 @@ public class Functions {
 
             // Ликвидация образовавшегося промежутка
             Query decreaseKeysRight = MANAGER.createQuery("update Category c set " +
-                    "c.rightKey = c.rightKey- (?1 - ?2 + 1)" +
+                    "c.rightKey = c.rightKey - (?1 - ?2 + 1)" +
                     "where c.rightKey > ?1 ");
 
             decreaseKeysRight.setParameter(1, selectedCategory.getRightKey());
@@ -180,7 +180,7 @@ public class Functions {
 
             Query decreaseKeysLeft = MANAGER.createQuery("update Category c set " +
                     "c.leftKey = c.leftKey - (?1 - ?2 + 1) " +
-                    "where c.leftKey > ?1");
+                    "where c.leftKey > ?2");
 
             decreaseKeysLeft.setParameter(1, selectedCategory.getRightKey());
             decreaseKeysLeft.setParameter(2, selectedCategory.getLeftKey());
@@ -188,51 +188,7 @@ public class Functions {
 
             // =============================================================================== //
 
-            TypedQuery<Long> selectMaxRightKeyQuery = MANAGER.createQuery("select max(c.rightKey) from Category c ",
-                    Long.class);
-            Long maxLeftKey = selectMaxRightKeyQuery.getSingleResult();
-            // абс(что хочу перенести - куда хочу перенести) - 1 = разница ключей
-            // где прав_кл >= куда хочу.прав_кл и лев_кл >= куда хочу.лев_кл
 
-            TypedQuery<Category> updatedRelocationCategory = MANAGER.createQuery("select c from Category c " +
-                    "where c.category_name = ?1", Category.class);
-            updatedRelocationCategory.setParameter(1, relocateCategoryName);
-            Category updatedRelocation = updatedRelocationCategory.getSingleResult();
-
-            // Увеличение только правого ключа категории куда хочу перенести
-            Query increaseRightKeyRelocateCategory = MANAGER.createQuery("update Category c set c.rightKey = ?1 " +
-                    "where c.category_name = ?2");
-            increaseRightKeyRelocateCategory.setParameter(1, updatedRelocation.getRightKey());
-            increaseRightKeyRelocateCategory.setParameter(2, relocateCategoryName);
-            increaseRightKeyRelocateCategory.executeUpdate();
-            System.out.println("selectedCategoryRightKey = " + selectedCategory.getRightKey());
-            System.out.println("relocateCategoryRightKey = " + updatedRelocation.getRightKey());
-
-
-            // Воспроизвести вставку элементов с отрицательными ключами
-
-
-
-            /*Query makingSpace = manager.createQuery("update Category c set c.leftKey = c.leftKey + (abs(?1 - ?2) - 1)," +
-                    " c.rightKey = c.rightKey + (abs(?1 - ?2) - 1) " +
-                    "where c.rightKey >= ?2 and c.leftKey >= ?3");
-            makingSpace.setParameter(1, selectedCategoryRightKey);
-            makingSpace.setParameter(2, relocateCategoryRightKey); // меняется ли правый ключ?
-            makingSpace.setParameter(3, relocateCategoryLeftKey);
-            makingSpace.executeUpdate();*/
-
-            /*selectedCategory.setLeftKey(maxLeftKey);
-            selectedCategory.setRightKey(relocateCategory.getRightKey() - 1);
-            Query updateCategories = manager.createQuery("update Category c set c.leftKey = abs(c.leftKey) + (?1 - ?2) * 2, c.rightKey = abs(c.rightKey) + (?1 - ?2) * 2" +
-                    "where c.leftKey < 0 and c.rightKey < 0");
-            updateCategories.setParameter(1, relocateCategory.getRightKey());
-            updateCategories.setParameter(2, maxLeftKey);
-            Query updateParent = manager.createQuery("update Category c set c.rightKey = ?2" +
-                    "where c.id = ?1 or (c.leftKey < ?2 and c.rightKey > ?2)");
-            updateParent.setParameter(1, relocateCategory.getId());
-            updateParent.setParameter(2, relocateCategory.getRightKey());
-            updateCategories.executeUpdate();
-            updateParent.executeUpdate();*/
 
             MANAGER.getTransaction().commit();
             System.out.println("Категория успешно перемещена!");
