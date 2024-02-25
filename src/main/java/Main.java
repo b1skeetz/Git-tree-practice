@@ -12,7 +12,7 @@ public class Main {
             menu();
             int operation = Integer.parseInt(scanner.nextLine());
             switch(operation){
-                case 1 -> Functions.createCategory();
+                case 1 -> Functions .createCategory();
                 case 2 -> Functions.deleteCategory();
                 case 3 -> Functions.findTree();
                 case 4 -> Functions.show();
