@@ -69,10 +69,11 @@ public class Functions {
             System.out.println(e.getMessage());
             MANAGER.getTransaction().rollback();
             return false;
-        } finally {
-            MANAGER.close();
-            FACTORY.close();
         }
+//        } finally {
+//            MANAGER.close();
+//            FACTORY.close();
+//        }
 
         return true;
     }
@@ -122,10 +123,11 @@ public class Functions {
             System.out.println(e.getMessage());
             MANAGER.getTransaction().rollback();
             return false;
-        } finally {
-            MANAGER.close();
-            FACTORY.close();
         }
+//        finally {
+//            MANAGER.close();
+//            FACTORY.close();
+//        }
         return true;
     }
 
@@ -224,10 +226,11 @@ public class Functions {
             MANAGER.getTransaction().rollback();
             System.out.println(e.getMessage());
             return false;
-        } finally {
-            MANAGER.close();
-            FACTORY.close();
         }
+//        finally {
+//            MANAGER.close();
+//            FACTORY.close();
+//        }
     }
 
     public static boolean findTree() {
@@ -254,10 +257,11 @@ public class Functions {
         } catch (NoResultException e) {
             System.out.println("Неправильно введено название категории!");
             return false;
-        } finally {
-            MANAGER.close();
-            FACTORY.close();
         }
+//        } finally {
+//            MANAGER.close();
+//            FACTORY.close();
+//        }
 
         return true;
     }
@@ -273,7 +277,7 @@ public class Functions {
             System.out.println(category);
         }
 
-        MANAGER.close();
-        FACTORY.close();
+//        MANAGER.close();
+//        FACTORY.close();
     }
 }
