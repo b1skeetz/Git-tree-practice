@@ -218,7 +218,14 @@ public class Functions {
             spareSpaceLeftKeysOnly.setParameter(2, relocateCategory.getRightKey());
             spareSpaceLeftKeysOnly.executeUpdate();
 
+            MANAGER.refresh(relocateCategory);
+
             // Возвращение ключей из отрицательного в нормальн состояние
+            Query keysFromNegativeToPositive = MANAGER.createQuery("update Category c set c.leftKey = 0 - c.leftKey " +
+                    "+ (?1 - ?2 - 1), c.rightKey = 0 - c.rightKey + (?1 - ?2 - 1) where c.rightKey < 0 and c.leftKey < 0");
+            keysFromNegativeToPositive.setParameter(1, relocateCategory.getRightKey());
+            keysFromNegativeToPositive.setParameter(2, selectedCategory.getRightKey());
+            keysFromNegativeToPositive.executeUpdate();
 
             MANAGER.getTransaction().commit();
             System.out.println("Категория успешно перемещена!");
