@@ -191,18 +191,11 @@ public class Functions {
             // =============================================================================== //
 
             // обновленная родительская категория с новыми ключами после усечения ключей
-            /*TypedQuery<Category> updatedParent = MANAGER.createQuery("select c from Category c " +
-                    "where c.category_name = ?1", Category.class);
-            updatedParent.setParameter(1, relocateCategory.getName());
-            Category updatedParentCategory = updatedParent.getSingleResult();*/
-
             MANAGER.refresh(relocateCategory);
 
             // Разница ключей выбранной категории для увеличения всех ключей категорий, идущих после родительской
             long selectedKeysDifference = selectedCategory.getRightKey() - selectedCategory.getLeftKey() + 1;
             System.out.println("LONG: " + selectedKeysDifference);
-
-            // случай, когда Наушники -> Комплектующие
 
             // увеличение только правых ключей там, где правый больше или равно обновленного родит катег правого ключа
             Query spareSpaceRightKeysOnly = MANAGER.createQuery("update Category c set c.rightKey = c.rightKey + ?1 " +
